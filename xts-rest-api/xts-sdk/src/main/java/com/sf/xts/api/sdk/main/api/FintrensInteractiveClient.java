@@ -70,10 +70,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		data.put("uniqueKey", uniqueKey);
 		data.put("source", source);
 		String response = this.requestHandler.processPostHttpRequest(request, data, "LOGIN",authToken);
-		if (response==null){
-			return null;
-		}
-		else {
+		if (response != null) {
 			JSONObject jsonObject = new JSONObject(response);
 			authToken = (String) ((JSONObject) jsonObject.get("result")).get("token");
 			user = (String) ((JSONObject) jsonObject.get("result")).get("userID");
@@ -82,6 +79,8 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 				initializeListner(this.xtsapiInteractiveEvents);
 			}
 			return authToken;
+		} else {
+			return null;
 		}
 	}
 
