@@ -70,14 +70,19 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		data.put("uniqueKey", uniqueKey);
 		data.put("source", source);
 		String response = this.requestHandler.processPostHttpRequest(request, data, "LOGIN",authToken);
-		JSONObject jsonObject = new JSONObject(response);
-		authToken = (String)((JSONObject)jsonObject.get("result")).get("token");
-		user = (String)((JSONObject)jsonObject.get("result")).get("userID");
-		isInvestorClient = (Boolean)((JSONObject)jsonObject.get("result")).get("isInvestorClient");
-		if (authToken != null) {
-			initializeListner(this.xtsapiInteractiveEvents);
+		if (response==null){
+			return null;
 		}
-		return authToken;
+		else {
+			JSONObject jsonObject = new JSONObject(response);
+			authToken = (String) ((JSONObject) jsonObject.get("result")).get("token");
+			user = (String) ((JSONObject) jsonObject.get("result")).get("userID");
+			isInvestorClient = (Boolean) ((JSONObject) jsonObject.get("result")).get("isInvestorClient");
+			if (authToken != null) {
+				initializeListner(this.xtsapiInteractiveEvents);
+			}
+			return authToken;
+		}
 	}
 
 	public Position getPosition(String posType)throws APIException {
