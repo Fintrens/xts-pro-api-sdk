@@ -19,8 +19,8 @@ import java.io.IOException;
 
 
 /**
- * It provides all Interactive API methods 
- * 
+ * It provides all Interactive API methods
+ *
  * @author SymphonyFintech
  */
 public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
@@ -43,7 +43,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
 		requestHandler = new FintrensRequestHandler();
 	}
-	
+
 	public void addListner(XTSAPIInteractiveEvents obj ) {
 		sh.addListner(obj);
 	}
@@ -69,15 +69,18 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		data.put("appKey", appKey);
 		data.put("uniqueKey", uniqueKey);
 		data.put("source", source);
-		String response = this.requestHandler.processPostHttpRequest(request, data, "LOGIN",authToken);
-		JSONObject jsonObject = new JSONObject(response);
-		authToken = (String)((JSONObject)jsonObject.get("result")).get("token");
-		user = (String)((JSONObject)jsonObject.get("result")).get("userID");
-		isInvestorClient = (Boolean)((JSONObject)jsonObject.get("result")).get("isInvestorClient");
-		if (authToken != null) {
-			initializeListner(this.xtsapiInteractiveEvents);
+		String response = this.requestHandler.processPostHttpRequest(request, data, "LOGIN", authToken);
+		if (response != null) {
+			JSONObject jsonObject = new JSONObject(response);
+			authToken = (String) ((JSONObject) jsonObject.get("result")).get("token");
+			user = (String) ((JSONObject) jsonObject.get("result")).get("userID");
+			isInvestorClient = (Boolean) ((JSONObject) jsonObject.get("result")).get("isInvestorClient");
+			if (authToken != null) {
+				initializeListner(this.xtsapiInteractiveEvents);
+			}
+			return authToken;
 		}
-		return authToken;
+		return null;
 	}
 
 	public Position getPosition(String posType)throws APIException {
