@@ -65,7 +65,7 @@ public class FintrensRequestHandler {
 			logger.debug("-----POST "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info(requestname + " failed due to exception: " + e.getMessage());
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
