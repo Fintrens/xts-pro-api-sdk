@@ -4,10 +4,8 @@ import com.sf.xts.api.sdk.ConfigurationProvider;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -17,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class FintrensRequestHandler {
 
@@ -39,10 +36,10 @@ public class FintrensRequestHandler {
 			logger.info("-----POST " + requestname + " RESPONSE-----" + content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info(requestname + " failed due to exception: " + e.getMessage());
+			e.printStackTrace();
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info(requestname + " failed due to exception: " + e.getMessage());
+			e.printStackTrace();
 		}
 		return content;
 	}
@@ -65,10 +62,10 @@ public class FintrensRequestHandler {
 			logger.debug("-----POST "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info(requestname + " failed due to exception: " + e.getMessage());
+			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info(requestname + " failed due to exception: " + e.getMessage());
+			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
 		}
 		return content;
 
@@ -92,10 +89,10 @@ public class FintrensRequestHandler {
 			logger.debug("-----GET  "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info(requestname + " failed due to exception: " + e.getMessage());
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info(requestname + " failed due to exception: " + e.getMessage());
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		}
 		return content;
 
