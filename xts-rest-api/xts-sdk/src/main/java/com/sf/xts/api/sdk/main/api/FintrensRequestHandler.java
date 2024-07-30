@@ -65,16 +65,10 @@ public class FintrensRequestHandler {
 			logger.debug("-----POST "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {} for appKey: {}",
-					requestname,
-					e.getMessage(),
-					data.get("appKey") != null ? data.get("appKey") : null);
+			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {} for appKey: {}",
-					requestname,
-					e.getMessage(),
-					data.get("appKey") != null ? data.get("appKey") : null);
+			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
 		}
 		return content;
 
