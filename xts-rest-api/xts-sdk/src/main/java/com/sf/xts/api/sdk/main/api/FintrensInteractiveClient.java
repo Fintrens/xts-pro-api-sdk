@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import com.sf.xts.api.sdk.FintrensConfigurationProvider;
 import com.sf.xts.api.sdk.interactive.SocketHandler;
 import com.sf.xts.api.sdk.interactive.XTSAPIInteractiveEvents;
+import com.sf.xts.api.sdk.interactive.cancelOrder.CancelOrderResponse;
+import com.sf.xts.api.sdk.interactive.orderhistory.OrderHistoryResponse;
 import com.sf.xts.api.sdk.interactive.placeOrder.PlaceOrderRequest;
 import com.sf.xts.api.sdk.interactive.placeOrder.PlaceOrderResponse;
 import com.sf.xts.api.sdk.interactive.position.Position;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -110,7 +113,28 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 				", Type: " + placeOrderResponse.getType());
 		return placeOrderResponse;
 	}
-
+	/**
+	 * it return all transaction detail report of requested orderID
+	 * @param appOrderID appOrderID for which you want to view the order history
+	 * @return Map return object of OrderHistory
+	 * @throws APIException catch the exception in your implementation
+	 */
+	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException {
+		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY");
+		OrderHistoryResponse orderHistoryResponse = gson.fromJson(data, OrderHistoryResponse.class);
+		return orderHistoryResponse;
+	}
+	/**
+	 * it cancel open order by providing appOrderId
+	 * @param appOrderId appOrderID for which trader want to modify the order
+	 * @return Map object of CancelOrderResponse
+	 * @throws APIException catch the exception in your implementation
+	 */
+	public CancelOrderResponse CancelOrder(String appOrderId) throws APIException {
+		String data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders?appOrderID="+appOrderId),"CANCELORDER");
+		CancelOrderResponse cancelOrderResponse = gson.fromJson(data, CancelOrderResponse.class);
+		return cancelOrderResponse;
+	}
 	public  boolean initializeListner(XTSAPIInteractiveEvents xtsapiInteractiveEvents) {
 		//Socket creating  for all the responses
 		sh = new SocketHandler(commonURL, user, authToken);

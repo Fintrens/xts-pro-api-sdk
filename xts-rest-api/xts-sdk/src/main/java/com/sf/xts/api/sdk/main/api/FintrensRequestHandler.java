@@ -7,7 +7,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -96,6 +95,56 @@ public class FintrensRequestHandler {
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+		}
+		return content;
+
+	}
+	String processDeleteHttpRequest(HttpDelete request, String  requestname){
+		logger.info("-----DELETE  "+requestname+" REQUEST-----"+request);
+		request.addHeader("content-type", "application/json");
+		if(request.getURI().toString().contains("marketdata"))
+			request.addHeader("authorization", MarketdataClient.authToken);
+		else
+			request.addHeader("authorization", InteractiveClient.authToken);
+		HttpResponse response = null;
+		Map<String, Object> map = null;
+		String content = null;
+		try {
+			response = httpClient.execute(request);
+			HttpEntity entity = new CheckResponse().check(response);
+			content = EntityUtils.toString(entity);
+			logger.info("-----DELETE  "+requestname+" RESPONSE-----"+content);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
+		} catch (APIException e) {
+			// TODO Auto-generated catch block
+			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
+		}
+		return content;
+
+	}
+	String processGettHttpRequest(HttpGet request, String  requestname){
+		logger.info("-----GET  "+requestname+" REQUEST-----"+request);
+		request.addHeader("content-type", "application/json");
+		if(request.getURI().toString().contains("marketdata"))
+			request.addHeader("authorization", MarketdataClient.authToken);
+		else
+			request.addHeader("authorization", InteractiveClient.authToken);
+		HttpResponse response = null;
+		String content = null;
+		try {
+			response = httpClient.execute(request);
+			HttpEntity entity = new CheckResponse().check(response);
+			content = EntityUtils.toString(entity);
+
+			logger.info("-----GET  "+requestname+" RESPONSE-----"+content);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
+		} catch (APIException e) {
+			// TODO Auto-generated catch block
+			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
 		}
 		return content;
 
