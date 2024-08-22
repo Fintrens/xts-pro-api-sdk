@@ -116,10 +116,10 @@ public class FintrensRequestHandler {
 			logger.info("-----DELETE  "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		}
 		return content;
 
