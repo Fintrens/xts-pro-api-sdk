@@ -120,7 +120,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	 * @throws APIException catch the exception in your implementation
 	 */
 	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException {
-		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY");
+		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY",authToken);
 		OrderHistoryResponse orderHistoryResponse = gson.fromJson(data, OrderHistoryResponse.class);
 		return orderHistoryResponse;
 	}
@@ -131,7 +131,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	 * @throws APIException catch the exception in your implementation
 	 */
 	public CancelOrderResponse CancelOrder(String appOrderId) throws APIException {
-		String data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders?appOrderID="+appOrderId),"CANCELORDER");
+		String data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders?appOrderID="+appOrderId),"CANCELORDER",authToken);
 		CancelOrderResponse cancelOrderResponse = gson.fromJson(data, CancelOrderResponse.class);
 		return cancelOrderResponse;
 	}

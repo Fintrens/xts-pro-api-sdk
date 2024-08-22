@@ -99,13 +99,13 @@ public class FintrensRequestHandler {
 		return content;
 
 	}
-	String processDeleteHttpRequest(HttpDelete request, String  requestname){
+	String processDeleteHttpRequest(HttpDelete request, String  requestname,String authToken){
 		logger.info("-----DELETE  "+requestname+" REQUEST-----"+request);
 		request.addHeader("content-type", "application/json");
 		if(request.getURI().toString().contains("marketdata"))
 			request.addHeader("authorization", MarketdataClient.authToken);
 		else
-			request.addHeader("authorization", InteractiveClient.authToken);
+			request.addHeader("authorization", authToken);
 		HttpResponse response = null;
 		Map<String, Object> map = null;
 		String content = null;
@@ -114,31 +114,6 @@ public class FintrensRequestHandler {
 			HttpEntity entity = new CheckResponse().check(response);
 			content = EntityUtils.toString(entity);
 			logger.info("-----DELETE  "+requestname+" RESPONSE-----"+content);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
-		} catch (APIException e) {
-			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
-		}
-		return content;
-
-	}
-	String processGettHttpRequest(HttpGet request, String  requestname){
-		logger.info("-----GET  "+requestname+" REQUEST-----"+request);
-		request.addHeader("content-type", "application/json");
-		if(request.getURI().toString().contains("marketdata"))
-			request.addHeader("authorization", MarketdataClient.authToken);
-		else
-			request.addHeader("authorization", InteractiveClient.authToken);
-		HttpResponse response = null;
-		String content = null;
-		try {
-			response = httpClient.execute(request);
-			HttpEntity entity = new CheckResponse().check(response);
-			content = EntityUtils.toString(entity);
-
-			logger.info("-----GET  "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to exception: {}", requestname, e.getMessage());
