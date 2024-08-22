@@ -8,7 +8,7 @@ public class PlaceOrderResponse {
 
     @SerializedName("result")
     @Expose
-    private Result result;
+    private Result result = null;
     
     @SerializedName("code")
     @Expose

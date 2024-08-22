@@ -8,7 +8,7 @@ import com.sf.xts.api.sdk.interactive.placeOrder.Result;
 public class CancelOrderResponse {
     @SerializedName("result")
     @Expose
-    private Result result = null;
+    private Result result;
     @SerializedName("code")
     @Expose
     private String code;
