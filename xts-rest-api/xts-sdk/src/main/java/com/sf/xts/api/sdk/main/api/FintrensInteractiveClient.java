@@ -78,9 +78,6 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 			authToken = (String) ((JSONObject) jsonObject.get("result")).get("token");
 			user = (String) ((JSONObject) jsonObject.get("result")).get("userID");
 			isInvestorClient = (Boolean) ((JSONObject) jsonObject.get("result")).get("isInvestorClient");
-			if (authToken != null) {
-				initializeListner(this.xtsapiInteractiveEvents);
-			}
 			return authToken;
 		}
 		return null;
