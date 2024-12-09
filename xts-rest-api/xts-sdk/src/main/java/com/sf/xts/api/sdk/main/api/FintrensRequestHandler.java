@@ -61,7 +61,7 @@ public class FintrensRequestHandler {
 			response = httpClient.execute(request);
 			HttpEntity entity = new CheckResponse().check(response);
 			content = EntityUtils.toString(entity);
-			logger.debug("-----POST "+requestname+" RESPONSE-----"+content);
+			logger.info("-----POST "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
