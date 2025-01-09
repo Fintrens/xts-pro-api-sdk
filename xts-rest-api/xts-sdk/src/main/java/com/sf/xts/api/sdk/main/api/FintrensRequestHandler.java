@@ -7,7 +7,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -62,13 +61,13 @@ public class FintrensRequestHandler {
 			response = httpClient.execute(request);
 			HttpEntity entity = new CheckResponse().check(response);
 			content = EntityUtils.toString(entity);
-			logger.debug("-----POST "+requestname+" RESPONSE-----"+content);
+			logger.info("-----POST "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("{} failed due to exception: {} for appKey: {}", requestname, e.getMessage(), data.get("appKey"));
 		}
 		return content;
 
@@ -92,10 +91,35 @@ public class FintrensRequestHandler {
 			logger.debug("-----GET  "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+		}
+		return content;
+
+	}
+	String processDeleteHttpRequest(HttpDelete request, String  requestname,String authToken){
+		logger.info("-----DELETE  "+requestname+" REQUEST-----"+request);
+		request.addHeader("content-type", "application/json");
+		if(request.getURI().toString().contains("marketdata"))
+			request.addHeader("authorization", MarketdataClient.authToken);
+		else
+			request.addHeader("authorization", authToken);
+		HttpResponse response = null;
+		Map<String, Object> map = null;
+		String content = null;
+		try {
+			response = httpClient.execute(request);
+			HttpEntity entity = new CheckResponse().check(response);
+			content = EntityUtils.toString(entity);
+			logger.info("-----DELETE  "+requestname+" RESPONSE-----"+content);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+		} catch (APIException e) {
+			// TODO Auto-generated catch block
+			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		}
 		return content;
 

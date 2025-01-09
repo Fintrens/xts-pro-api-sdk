@@ -33,12 +33,18 @@ public class PositionList {
     @SerializedName("ProductType")
     @Expose
     private String productType;
+    @SerializedName("OpenSellQuantity")
+    @Expose
+    private Number openSellQuantity;
     @SerializedName("SellAveragePrice")
     @Expose
     private String sellAveragePrice;
     @SerializedName("BEP")
     @Expose
     private String bEP;
+    @SerializedName("OpenBuyQuantity")
+    @Expose
+    private Number openBuyQuantity;
     @SerializedName("BuyAveragePrice")
     @Expose
     private String buyAveragePrice;
@@ -236,6 +242,22 @@ public class PositionList {
     }
 
     /**
+     * it return openSellQuantity
+     * @return Number
+     */
+    public Number getOpenSellQuantity() {
+        return openSellQuantity;
+    }
+
+    /**
+     * it set the openSellQuantity
+     * @param openSellQuantity Number
+     */
+    public void setOpenSellQuantity(Number openSellQuantity) {
+        this.openSellQuantity = openSellQuantity;
+    }
+
+    /**
      * it return sellAveragePrice
      * @return String
      */
@@ -265,6 +287,22 @@ public class PositionList {
      */
     public void setBEP(String bEP) {
         this.bEP = bEP;
+    }
+
+    /**
+     * it return openBuyQuantity
+     * @return Number
+     */
+    public Number getOpenBuyQuantity() {
+        return openBuyQuantity;
+    }
+
+    /**
+     * it set the openBuyQuantity
+     * @param openBuyQuantity Number
+     */
+    public void setOpenBuyQuantity(Number openBuyQuantity) {
+        this.openBuyQuantity = openBuyQuantity;
     }
 
     /**
