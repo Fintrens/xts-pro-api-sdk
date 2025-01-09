@@ -135,7 +135,7 @@
 		<dependency>
 			<groupId>com.symphonyfintech.xts.rest</groupId>
 			<artifactId>xts-rest</artifactId>
-			<version>1.1.9</version>
+			<version>1.1.10</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

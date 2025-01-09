@@ -4,6 +4,7 @@ import com.sf.xts.api.sdk.ConfigurationProvider;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -21,7 +22,15 @@ import java.util.Map;
 public class FintrensRequestHandler {
 
 	public static Logger logger = LoggerFactory.getLogger(FintrensRequestHandler.class);
-	private HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(ConfigurationProvider.sslSocketFactory).build();
+	RequestConfig requestConfig = RequestConfig.custom()
+			.setConnectionRequestTimeout(10000)
+			.setConnectTimeout(10000)
+			.setSocketTimeout(3000)
+			.build();
+	private HttpClient httpClient = HttpClientBuilder.create()
+			.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
+			.setDefaultRequestConfig(requestConfig)
+			.build();
 	ObjectMapper objectMapper = new ObjectMapper();
 
 	String processPostHttpHostRequest(HttpPost request, JSONObject data, String requestname) {
