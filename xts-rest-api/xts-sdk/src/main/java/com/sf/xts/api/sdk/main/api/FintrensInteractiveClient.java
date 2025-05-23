@@ -14,6 +14,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		interactiveURL = (String)((JSONObject)jsonObject.get("result")).get("connectionString");
 	}
 
-	public String Login(String secretKey, String appKey) throws APIException {
+	public String Login(String secretKey, String appKey) throws APIException, ConnectTimeoutException {
 		this.HostLookUp();
 		HttpPost request = new HttpPost(interactiveURL + loginINT);
 		request.addHeader("content-type", "application/json");
@@ -84,13 +85,13 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		return null;
 	}
 
-	public Position getPosition(String posType)throws APIException {
+	public Position getPosition(String posType) throws APIException, ConnectTimeoutException {
 		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + positions + "?dayOrNet=" + posType),"POSITION",authToken);
 		Position position = gson.fromJson(data, Position.class);
 		return position;
 	}
 
-	public PlaceOrderResponse PlaceOrder(PlaceOrderRequest placeOrderRequest) {
+	public PlaceOrderResponse PlaceOrder(PlaceOrderRequest placeOrderRequest) throws ConnectTimeoutException {
 		JSONObject placeOrderJson = new JSONObject();
 		placeOrderJson.put("exchangeSegment", placeOrderRequest.exchangeSegment);
 		placeOrderJson.put("exchangeInstrumentID", placeOrderRequest.exchangeInstrumentId);
@@ -118,7 +119,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	 * @return Map return object of OrderHistory
 	 * @throws APIException catch the exception in your implementation
 	 */
-	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException {
+	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException, ConnectTimeoutException {
 		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY",authToken);
 		OrderHistoryResponse orderHistoryResponse = gson.fromJson(data, OrderHistoryResponse.class);
 		return orderHistoryResponse;
@@ -129,7 +130,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	 * @return Map object of CancelOrderResponse
 	 * @throws APIException catch the exception in your implementation
 	 */
-	public OrderBook getOrderBook() throws APIException {
+	public OrderBook getOrderBook() throws APIException, ConnectTimeoutException {
 		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook),"ORDERBOOK",authToken);
 		OrderBook orderBookResponse = gson.fromJson(data, OrderBook.class);
 		return orderBookResponse;
