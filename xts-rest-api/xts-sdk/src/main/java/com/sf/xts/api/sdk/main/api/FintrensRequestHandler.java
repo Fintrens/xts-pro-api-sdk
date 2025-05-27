@@ -17,7 +17,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Map;
 
 public class FintrensRequestHandler {
@@ -56,7 +60,7 @@ public class FintrensRequestHandler {
 		return content;
 	}
 
-	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws ConnectTimeoutException {
+	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws SocketException, ConnectTimeoutException, SSLException {
 		logger.info("-----POST "+requestname+" REQUEST-----"+request);
 		HttpResponse response = null;
 		String content = null;
@@ -77,6 +81,10 @@ public class FintrensRequestHandler {
 			logger.info("{} failed due to IOException: {} for authToken: {}", requestname, e.getMessage(),authToken);
 			if(e instanceof ConnectTimeoutException){
 				throw new ConnectTimeoutException();
+			} else if(e instanceof SocketException) {
+				throw new SocketException();
+			} else if(e instanceof  SSLException) {
+				throw new SSLException(e.getMessage());
 			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
@@ -87,7 +95,7 @@ public class FintrensRequestHandler {
 	}
 
 
-	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws ConnectTimeoutException {
+	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws SocketException, ConnectTimeoutException, SSLException {
 		logger.info("-----GET  "+requestname+" REQUEST-----"+request);
 		request.addHeader("content-type", "application/json");
 		if(request.getURI().toString().contains("marketdata"))
@@ -107,6 +115,10 @@ public class FintrensRequestHandler {
 			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
 			if(e instanceof ConnectTimeoutException){
 				throw new ConnectTimeoutException();
+			} else if(e instanceof SocketException) {
+				throw new SocketException();
+			} else if(e instanceof  SSLException) {
+				throw new SSLException(e.getMessage());
 			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
