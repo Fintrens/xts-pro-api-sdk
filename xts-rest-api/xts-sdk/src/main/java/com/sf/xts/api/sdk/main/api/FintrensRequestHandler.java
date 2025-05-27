@@ -8,6 +8,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -16,7 +17,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Map;
 
 public class FintrensRequestHandler {
@@ -55,7 +60,7 @@ public class FintrensRequestHandler {
 		return content;
 	}
 
-	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken){
+	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws IOException {
 		logger.info("-----POST "+requestname+" REQUEST-----"+request);
 		HttpResponse response = null;
 		String content = null;
@@ -74,6 +79,9 @@ public class FintrensRequestHandler {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to IOException: {} for authToken: {}", requestname, e.getMessage(),authToken);
+			if(e instanceof ConnectTimeoutException || e instanceof SocketException || e instanceof  SSLException ){
+				throw e;
+			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to APIException: {} for authToken: {}", requestname, e.getMessage(),authToken);
@@ -83,7 +91,7 @@ public class FintrensRequestHandler {
 	}
 
 
-	String processGettHttpRequest(HttpGet request, String  requestname,String authToken){
+	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws IOException {
 		logger.info("-----GET  "+requestname+" REQUEST-----"+request);
 		request.addHeader("content-type", "application/json");
 		if(request.getURI().toString().contains("marketdata"))
@@ -101,6 +109,9 @@ public class FintrensRequestHandler {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			if(e instanceof ConnectTimeoutException || e instanceof SocketException || e instanceof  SSLException ){
+				throw e;
+			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
