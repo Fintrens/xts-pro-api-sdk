@@ -60,7 +60,7 @@ public class FintrensRequestHandler {
 		return content;
 	}
 
-	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws SocketException, ConnectTimeoutException, SSLException {
+	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws IOException {
 		logger.info("-----POST "+requestname+" REQUEST-----"+request);
 		HttpResponse response = null;
 		String content = null;
@@ -79,12 +79,8 @@ public class FintrensRequestHandler {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to IOException: {} for authToken: {}", requestname, e.getMessage(),authToken);
-			if(e instanceof ConnectTimeoutException){
-				throw new ConnectTimeoutException();
-			} else if(e instanceof SocketException) {
-				throw new SocketException();
-			} else if(e instanceof  SSLException) {
-				throw new SSLException(e.getMessage());
+			if(e instanceof ConnectTimeoutException || e instanceof SocketException || e instanceof  SSLException ){
+				throw e;
 			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
@@ -95,7 +91,7 @@ public class FintrensRequestHandler {
 	}
 
 
-	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws SocketException, ConnectTimeoutException, SSLException {
+	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws IOException {
 		logger.info("-----GET  "+requestname+" REQUEST-----"+request);
 		request.addHeader("content-type", "application/json");
 		if(request.getURI().toString().contains("marketdata"))
@@ -113,12 +109,8 @@ public class FintrensRequestHandler {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
-			if(e instanceof ConnectTimeoutException){
-				throw new ConnectTimeoutException();
-			} else if(e instanceof SocketException) {
-				throw new SocketException();
-			} else if(e instanceof  SSLException) {
-				throw new SSLException(e.getMessage());
+			if(e instanceof ConnectTimeoutException || e instanceof SocketException || e instanceof  SSLException ){
+				throw e;
 			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
