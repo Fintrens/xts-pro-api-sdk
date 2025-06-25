@@ -26,7 +26,7 @@ public class TestFintrensInteractive implements XTSAPIInteractiveEvents {
 
 	private static void createSession(String secretKey,String appKey) throws IOException, APIException {
 		FintrensInteractiveClient interactiveClient = null;
-		interactiveClient = new FintrensInteractiveClient(new TestFintrensInteractive());
+		interactiveClient = new FintrensInteractiveClient(null,new TestFintrensInteractive());
 		interactiveClient.Login(secretKey, appKey); //FINDOC
 		if (InteractiveClient.authToken == null) {
 			logger.debug(".....Login error......");
