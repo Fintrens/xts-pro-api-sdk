@@ -28,7 +28,7 @@ public abstract class FintrensConfigurationProvider {
 	}
 	public Logger logger = LoggerFactory.getLogger(FintrensConfigurationProvider.class);
 
-	String propFileName = "config.properties";
+	public String propFileName = "config.properties";
 	public String commonURL = null;
 	public String source = null;
 	
