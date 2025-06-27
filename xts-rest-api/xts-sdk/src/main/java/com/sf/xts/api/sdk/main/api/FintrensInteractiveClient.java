@@ -55,7 +55,6 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
 		requestHandler = new FintrensRequestHandler();
 	}
-
 	public void addListner(XTSAPIInteractiveEvents obj ) {
 		sh.addListner(obj);
 	}
