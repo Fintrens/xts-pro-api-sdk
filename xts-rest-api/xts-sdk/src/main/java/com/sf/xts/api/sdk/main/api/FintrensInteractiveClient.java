@@ -48,6 +48,8 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	public FintrensInteractiveClient(String brokerName,XTSAPIInteractiveEvents xtsapiInteractiveEvents) throws IOException{
 		if(brokerName.equalsIgnoreCase("JAINAM")){
 			this.propFileName ="jainam-config.properties";
+		}else if(brokerName.equalsIgnoreCase("AJMERA")){
+			this.propFileName ="ajmera-config.properties";
 		}
 		loadConfiguration();
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
