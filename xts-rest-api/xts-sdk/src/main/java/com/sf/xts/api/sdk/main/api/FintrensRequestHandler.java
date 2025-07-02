@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -43,9 +44,7 @@ public class FintrensRequestHandler {
 		HttpResponse response = null;
 		String content = null;
 		try {
-			request.addHeader("content-type", "application/json");
-			request.setEntity(new StringEntity(data.toString()));
-			request.addHeader("content-type", "application/json");
+			request.setEntity(new StringEntity(data.toString(), ContentType.APPLICATION_JSON));
 			response = this.httpClient.execute(request);
 			HttpEntity entity = (new CheckResponse()).check(response);
 			content = EntityUtils.toString(entity);
