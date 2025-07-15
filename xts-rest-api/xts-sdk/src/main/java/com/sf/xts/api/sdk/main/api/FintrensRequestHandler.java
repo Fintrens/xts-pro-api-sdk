@@ -36,6 +36,7 @@ public class FintrensRequestHandler {
 	private HttpClient httpClient = HttpClientBuilder.create()
 			.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
 			.setDefaultRequestConfig(requestConfig)
+			.setMaxConnPerRoute(50)
 			.build();
 	ObjectMapper objectMapper = new ObjectMapper();
 
