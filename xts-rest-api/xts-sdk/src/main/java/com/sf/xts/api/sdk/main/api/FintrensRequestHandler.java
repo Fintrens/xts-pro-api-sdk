@@ -81,7 +81,7 @@ public class FintrensRequestHandler {
 				throw e;
 			}
 		} catch (APIException e) {
-			logger.info("{} failed due to APIException: {} for authToken: {}", new Object[]{requestname, e.getMessage(), authToken});
+			logger.info("{} failed due to APIException: {} for authToken: {}", requestname, e.getMessage(),authToken);
 			String errorMessage = e.getMessage();
 			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
 				throw e;
