@@ -14,15 +14,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLException;
 import java.io.IOException;
-import java.net.SocketException;
+
 
 
 /**
@@ -92,12 +90,17 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	}
 
 	public Position getPosition(String posType) throws APIException, IOException {
-		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + positions + "?dayOrNet=" + posType),"POSITION",authToken);
-		Position position = gson.fromJson(data, Position.class);
-		return position;
+		try {
+			String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + positions + "?dayOrNet=" + posType), "POSITION", authToken);
+			Position position = gson.fromJson(data, Position.class);
+			return position;
+		} catch (APIException e) {
+			logger.error("APIException occurred while fetching position: {}", e.getMessage());
+			throw e;
+		}
 	}
 
-	public PlaceOrderResponse PlaceOrder(PlaceOrderRequest placeOrderRequest) throws IOException {
+	public PlaceOrderResponse PlaceOrder(PlaceOrderRequest placeOrderRequest) throws IOException, APIException {
 		JSONObject placeOrderJson = new JSONObject();
 		placeOrderJson.put("exchangeSegment", placeOrderRequest.exchangeSegment);
 		placeOrderJson.put("exchangeInstrumentID", placeOrderRequest.exchangeInstrumentId);
@@ -111,7 +114,13 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		placeOrderJson.put("stopPrice", placeOrderRequest.stopPrice);
 		placeOrderJson.put("orderUniqueIdentifier", placeOrderRequest.orderUniqueIdentifier);
 		placeOrderJson.put("apiOrderSource","FIREFLY_BY_FINTRENS");
-		String data = requestHandler.processPostHttpRequest(new HttpPost(interactiveURL + orderBook),placeOrderJson,"PLACEORDER",authToken);
+		String data;
+		try {
+		 data = requestHandler.processPostHttpRequest(new HttpPost(interactiveURL + orderBook),placeOrderJson,"PLACEORDER",authToken);
+		} catch (APIException e) {
+			logger.error("APIException occurred while placing order: {}", e.getMessage());
+			throw e;
+		}
 		PlaceOrderResponse placeOrderResponse = gson.fromJson(data, PlaceOrderResponse.class);
 		logger.info("AppOrderId: " + placeOrderResponse.getResult().getAppOrderID().toString() +
 				", Description: " + placeOrderResponse.getDescription() +
@@ -126,7 +135,13 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	 * @throws APIException catch the exception in your implementation
 	 */
 	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException, IOException {
-		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY",authToken);
+		String data;
+		try {
+			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY",authToken);
+		} catch (APIException e) {
+			logger.error("APIException occurred while fetching order history for appOrderID {}: {}", appOrderID, e.getMessage());
+			throw e;
+		}
 		OrderHistoryResponse orderHistoryResponse = gson.fromJson(data, OrderHistoryResponse.class);
 		return orderHistoryResponse;
 	}
@@ -137,12 +152,24 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	 * @throws APIException catch the exception in your implementation
 	 */
 	public OrderBook getOrderBook() throws APIException, IOException {
-		String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook),"ORDERBOOK",authToken);
+		String data;
+		try {
+			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook),"ORDERBOOK",authToken);
+		} catch (APIException e) {
+			logger.error("APIException occurred while fetching order book: {}", e.getMessage());
+			throw e;
+		}
 		OrderBook orderBookResponse = gson.fromJson(data, OrderBook.class);
 		return orderBookResponse;
 	}
 	public CancelOrderResponse CancelOrder(String appOrderId) throws APIException {
-		String data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders?appOrderID="+appOrderId),"CANCELORDER",authToken);
+		String data;
+		try {
+			data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders?appOrderID="+appOrderId),"CANCELORDER",authToken);
+		} catch (APIException e) {
+			logger.error("APIException occurred while cancelling order with appOrderID {}: {}", appOrderId, e.getMessage());
+			throw e;
+		}
 		CancelOrderResponse cancelOrderResponse = gson.fromJson(data, CancelOrderResponse.class);
 		return cancelOrderResponse;
 	}
