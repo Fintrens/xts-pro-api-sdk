@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.Map;
 
 public class FintrensRequestHandler {
@@ -60,7 +58,7 @@ public class FintrensRequestHandler {
 		return content;
 	}
 
-	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws IOException {
+	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws IOException, APIException {
 		logger.info("-----POST "+requestname+" REQUEST-----"+request);
 		HttpResponse response = null;
 		String content = null;
@@ -83,15 +81,18 @@ public class FintrensRequestHandler {
 				throw e;
 			}
 		} catch (APIException e) {
-			// TODO Auto-generated catch block
 			logger.info("{} failed due to APIException: {} for authToken: {}", requestname, e.getMessage(),authToken);
+			String errorMessage = e.getMessage();
+			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
+				throw e;
+			}
 		}
 		return content;
 
 	}
 
 
-	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws IOException {
+	String processGettHttpRequest(HttpGet request, String  requestname,String authToken) throws IOException, APIException {
 		logger.info("-----GET  "+requestname+" REQUEST-----"+request);
 		request.addHeader("content-type", "application/json");
 		if(request.getURI().toString().contains("marketdata"))
@@ -108,18 +109,22 @@ public class FintrensRequestHandler {
 			logger.debug("-----GET  "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			logger.info("{} failed due to IOException: {} for authToken: {}", requestname, e.getMessage(), authToken);
 			if(e instanceof ConnectTimeoutException || e instanceof SocketException || e instanceof  SSLException ){
 				throw e;
 			}
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			logger.info("{} failed due to APIException: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			String errorMessage = e.getMessage();
+			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
+				throw e;
+			}
 		}
 		return content;
 
 	}
-	String processDeleteHttpRequest(HttpDelete request, String  requestname,String authToken){
+	String processDeleteHttpRequest(HttpDelete request, String  requestname,String authToken) throws APIException {
 		logger.info("-----DELETE  "+requestname+" REQUEST-----"+request);
 		request.addHeader("content-type", "application/json");
 		if(request.getURI().toString().contains("marketdata"))
@@ -136,10 +141,14 @@ public class FintrensRequestHandler {
 			logger.info("-----DELETE  "+requestname+" RESPONSE-----"+content);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			logger.info("{} failed due to IOException: {} for authToken: {}", requestname, e.getMessage(), authToken);
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
-			logger.info("{} failed due to exception: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			logger.info("{} failed due to APIException: {} for authToken: {}", requestname, e.getMessage(), authToken);
+			String errorMessage = e.getMessage();
+			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
+				throw e;
+			}
 		}
 		return content;
 
