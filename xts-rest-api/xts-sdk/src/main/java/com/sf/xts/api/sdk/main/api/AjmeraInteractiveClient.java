@@ -1,7 +1,7 @@
 package com.sf.xts.api.sdk.main.api;
 
 import com.google.gson.Gson;
-import com.sf.xts.api.sdk.FintrensConfigurationProvider;
+import com.sf.xts.api.sdk.AjmeraConfigurationProvider;
 import com.sf.xts.api.sdk.interactive.SocketHandler;
 import com.sf.xts.api.sdk.interactive.XTSAPIInteractiveEvents;
 import com.sf.xts.api.sdk.interactive.cancelOrder.CancelOrderResponse;
@@ -15,6 +15,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ import java.io.IOException;
  *
  * @author SymphonyFintech
  */
-public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
+public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 	private HttpClient httpClient = HttpClientBuilder.create().build();
 	Gson gson = new Gson();
 	private  SocketHandler sh=null;
@@ -38,20 +39,18 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	public  String user = null;
 	public  boolean isInvestorClient = true;
 	public  String clientID = null;
-	public  Logger logger = LoggerFactory.getLogger(FintrensInteractiveClient.class);
+	public  Logger logger = LoggerFactory.getLogger(AjmeraInteractiveClient.class);
 	Object object = new Object();
-	FintrensRequestHandler requestHandler;
+	AjmeraRequestHandler requestHandler;
 	XTSAPIInteractiveEvents xtsapiInteractiveEvents;
 
-	public FintrensInteractiveClient(String brokerName,XTSAPIInteractiveEvents xtsapiInteractiveEvents) throws IOException{
-		if(brokerName.equalsIgnoreCase("JAINAM")){
-			this.propFileName ="jainam-config.properties";
-		}else if(brokerName.equalsIgnoreCase("AJMERA")){
+	public AjmeraInteractiveClient(String brokerName, XTSAPIInteractiveEvents xtsapiInteractiveEvents) throws IOException{
+		 if(brokerName.equalsIgnoreCase("AJMERA")){
 			this.propFileName ="ajmera-config.properties";
 		}
 		loadConfiguration();
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
-		requestHandler = new FintrensRequestHandler();
+		requestHandler = new AjmeraRequestHandler();
 	}
 	public void addListner(XTSAPIInteractiveEvents obj ) {
 		sh.addListner(obj);
@@ -83,6 +82,8 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 			JSONObject jsonObject = new JSONObject(response);
 			authToken = (String) ((JSONObject) jsonObject.get("result")).get("token");
 			user = (String) ((JSONObject) jsonObject.get("result")).get("userID");
+			JSONArray clientCodes = (JSONArray) ((JSONObject) jsonObject.get("result")).get("clientCodes");
+			this.clientID = (String) clientCodes.get(0);
 			isInvestorClient = (Boolean) ((JSONObject) jsonObject.get("result")).get("isInvestorClient");
 			return authToken;
 		}
@@ -91,7 +92,13 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 
 	public Position getPosition(String posType) throws APIException, IOException {
 		try {
-			String data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + positions + "?dayOrNet=" + posType), "POSITION", authToken);
+			String data = requestHandler.processGettHttpRequest(
+					new HttpGet(interactiveURL + positions
+							+ "?dayOrNet=" + posType
+							+ "&clientID=" + clientID),
+					"POSITION",
+					authToken
+			);
 			Position position = gson.fromJson(data, Position.class);
 			return position;
 		} catch (APIException e) {
@@ -102,6 +109,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 
 	public PlaceOrderResponse PlaceOrder(PlaceOrderRequest placeOrderRequest) throws IOException, APIException {
 		JSONObject placeOrderJson = new JSONObject();
+		placeOrderJson.put("clientID",clientID);
 		placeOrderJson.put("exchangeSegment", placeOrderRequest.exchangeSegment);
 		placeOrderJson.put("exchangeInstrumentID", placeOrderRequest.exchangeInstrumentId);
 		placeOrderJson.put("productType",placeOrderRequest.productType);
@@ -137,7 +145,9 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException, IOException {
 		String data;
 		try {
-			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?appOrderID="+appOrderID),"ORDERHISTORY",authToken);
+			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook
+					+ "?appOrderID=" + appOrderID
+					+ "&clientID=" + clientID), "ORDERHISTORY", authToken);
 		} catch (APIException e) {
 			logger.error("APIException occurred while fetching order history for appOrderID {}: {}", appOrderID, e.getMessage());
 			throw e;
@@ -154,7 +164,7 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 	public OrderBook getOrderBook() throws APIException, IOException {
 		String data;
 		try {
-			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook),"ORDERBOOK",authToken);
+			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?clientID=" + clientID), "ORDERBOOK", authToken);
 		} catch (APIException e) {
 			logger.error("APIException occurred while fetching order book: {}", e.getMessage());
 			throw e;
@@ -162,10 +172,14 @@ public  class FintrensInteractiveClient extends FintrensConfigurationProvider {
 		OrderBook orderBookResponse = gson.fromJson(data, OrderBook.class);
 		return orderBookResponse;
 	}
-	public CancelOrderResponse CancelOrder(String appOrderId) throws APIException {
+	public CancelOrderResponse CancelOrder(String appOrderId,String orderUniqueIdentifier) throws APIException {
 		String data;
 		try {
-			data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders?appOrderID="+appOrderId),"CANCELORDER",authToken);
+			data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders"
+							+ "?appOrderID=" + appOrderId
+							+ "&orderUniqueIdentifier=" + orderUniqueIdentifier
+							+ "&clientID=" + clientID)
+					, "CANCELORDER", authToken);
 		} catch (APIException e) {
 			logger.error("APIException occurred while cancelling order with appOrderID {}: {}", appOrderId, e.getMessage());
 			throw e;

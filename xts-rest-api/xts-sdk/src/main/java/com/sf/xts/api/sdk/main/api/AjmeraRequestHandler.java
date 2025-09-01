@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.util.Map;
 
-public class FintrensRequestHandler {
+public class AjmeraRequestHandler {
 
-	public static Logger logger = LoggerFactory.getLogger(FintrensRequestHandler.class);
+	public static Logger logger = LoggerFactory.getLogger(AjmeraRequestHandler.class);
 	RequestConfig requestConfig = RequestConfig.custom()
 			.setConnectionRequestTimeout(10000)
 			.setConnectTimeout(10000)

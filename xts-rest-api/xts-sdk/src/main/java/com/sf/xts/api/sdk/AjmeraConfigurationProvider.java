@@ -19,14 +19,14 @@ import java.util.Properties;
  * 
  * @author SymphonyFintech
  */
-public abstract class FintrensConfigurationProvider {
+public abstract class AjmeraConfigurationProvider {
 	static{    
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss");
 		SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 		System.setProperty("current.date.time", dateFormat.format(new Date()));
 		System.setProperty("current.day", dayFormat.format(new Date()));
 	}
-	public Logger logger = LoggerFactory.getLogger(FintrensConfigurationProvider.class);
+	public Logger logger = LoggerFactory.getLogger(AjmeraConfigurationProvider.class);
 
 	public String propFileName = "config.properties";
 	public String commonURL = null;
