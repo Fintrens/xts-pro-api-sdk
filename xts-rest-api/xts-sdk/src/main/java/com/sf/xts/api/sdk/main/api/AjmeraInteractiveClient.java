@@ -109,7 +109,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 
 	public PlaceOrderResponse PlaceOrder(PlaceOrderRequest placeOrderRequest) throws IOException, APIException {
 		JSONObject placeOrderJson = new JSONObject();
-		placeOrderJson.put("clientID",clientID);
+		placeOrderJson.put("clientID","*****");
 		placeOrderJson.put("exchangeSegment", placeOrderRequest.exchangeSegment);
 		placeOrderJson.put("exchangeInstrumentID", placeOrderRequest.exchangeInstrumentId);
 		placeOrderJson.put("productType",placeOrderRequest.productType);
