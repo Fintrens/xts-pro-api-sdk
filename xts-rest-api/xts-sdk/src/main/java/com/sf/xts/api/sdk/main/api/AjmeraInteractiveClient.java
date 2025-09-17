@@ -52,6 +52,18 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
 		requestHandler = new AjmeraRequestHandler();
 	}
+
+	public AjmeraInteractiveClient(String brokerName,XTSAPIInteractiveEvents xtsapiInteractiveEvents,String proxyHost,int proxyPort,String proxyType,String proxyUsername,String proxyPassword) throws IOException {
+		if(brokerName.equalsIgnoreCase("JAINAM")){
+			this.propFileName ="jainam-config.properties";
+		}else if(brokerName.equalsIgnoreCase("AJMERA")){
+			this.propFileName ="ajmera-config.properties";
+		}
+		loadConfiguration();
+		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
+		requestHandler = new AjmeraRequestHandler(proxyHost, proxyPort, proxyUsername, proxyPassword);
+	}
+
 	public void addListner(XTSAPIInteractiveEvents obj ) {
 		sh.addListner(obj);
 	}

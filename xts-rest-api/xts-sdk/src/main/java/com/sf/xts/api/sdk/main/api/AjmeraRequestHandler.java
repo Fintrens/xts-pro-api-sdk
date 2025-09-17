@@ -2,7 +2,11 @@ package com.sf.xts.api.sdk.main.api;
 
 import com.sf.xts.api.sdk.ConfigurationProvider;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
@@ -11,6 +15,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -31,12 +36,32 @@ public class AjmeraRequestHandler {
 			.setConnectTimeout(10000)
 			.setSocketTimeout(3000)
 			.build();
-	private HttpClient httpClient = HttpClientBuilder.create()
-			.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
-			.setDefaultRequestConfig(requestConfig)
-			.setMaxConnPerRoute(50)
-			.build();
+	private HttpClient httpClient;
 	ObjectMapper objectMapper = new ObjectMapper();
+
+	public AjmeraRequestHandler() {
+		httpClient = HttpClientBuilder.create()
+				.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
+				.setDefaultRequestConfig(this.requestConfig)
+				.setMaxConnPerRoute(50)
+				.build();
+	}
+
+	public AjmeraRequestHandler(String proxyHost, int proxyPort, String proxyUsername, String proxyPassword) {
+		HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+				.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
+				.setDefaultRequestConfig(this.requestConfig)
+				.setMaxConnPerRoute(50);
+		HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+		clientBuilder.setProxy(proxy);
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(
+				new AuthScope(proxyHost, proxyPort),
+				new UsernamePasswordCredentials(proxyUsername, proxyPassword)
+		);
+		clientBuilder.setDefaultCredentialsProvider(credsProvider);
+		httpClient = clientBuilder.build();
+	}
 
 	String processPostHttpHostRequest(HttpPost request, JSONObject data, String requestname) {
 		logger.info("-----POST " + requestname + " REQUEST-----" + request);
