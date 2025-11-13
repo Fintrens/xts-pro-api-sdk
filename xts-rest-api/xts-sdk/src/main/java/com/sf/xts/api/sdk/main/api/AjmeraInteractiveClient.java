@@ -68,7 +68,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		sh.addListner(obj);
 	}
 
-	public void HostLookUp() throws APIException {
+	public void HostLookUp(String commonUrl,String port) throws APIException {
 		HttpPost request = new HttpPost(commonURL+port + hostLookUp);
 		request.addHeader("content-type", "application/json");
 		JSONObject data = new JSONObject();
@@ -80,8 +80,8 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		interactiveURL = (String)((JSONObject)jsonObject.get("result")).get("connectionString");
 	}
 
-	public String Login(String secretKey, String appKey) throws APIException, IOException {
-		this.HostLookUp();
+	public String Login(String secretKey, String appKey,String commonUrl,String port) throws APIException, IOException {
+		this.HostLookUp(commonUrl,port);
 		HttpPost request = new HttpPost(interactiveURL + loginINT);
 		request.addHeader("content-type", "application/json");
 		JSONObject data = new JSONObject();
@@ -142,11 +142,16 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 			throw e;
 		}
 		PlaceOrderResponse placeOrderResponse = gson.fromJson(data, PlaceOrderResponse.class);
-		logger.info("AppOrderId: " + placeOrderResponse.getResult().getAppOrderID().toString() +
-				", Description: " + placeOrderResponse.getDescription() +
-				", Code: " + placeOrderResponse.getCode() +
-				", Type: " + placeOrderResponse.getType());
-		return placeOrderResponse;
+		if(placeOrderResponse != null && placeOrderResponse.getResult() != null && placeOrderResponse.getResult().getAppOrderID() != null) {
+			logger.info("AppOrderId: " + placeOrderResponse.getResult().getAppOrderID().toString() +
+					", Description: " + placeOrderResponse.getDescription() +
+					", Code: " + placeOrderResponse.getCode() +
+					", Type: " + placeOrderResponse.getType());
+			return placeOrderResponse;
+		}else{
+			logger.error("Place order response is null");
+			return null;
+		}
 	}
 	/**
 	 * it return all transaction detail report of requested orderID
