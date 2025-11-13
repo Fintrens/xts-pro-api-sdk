@@ -142,7 +142,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 			throw e;
 		}
 		PlaceOrderResponse placeOrderResponse = gson.fromJson(data, PlaceOrderResponse.class);
-		if(placeOrderResponse!=null && placeOrderResponse.getResult()!=null) {
+		if(placeOrderResponse != null && placeOrderResponse.getResult() != null && placeOrderResponse.getResult().getAppOrderID() != null) {
 			logger.info("AppOrderId: " + placeOrderResponse.getResult().getAppOrderID().toString() +
 					", Description: " + placeOrderResponse.getDescription() +
 					", Code: " + placeOrderResponse.getCode() +
