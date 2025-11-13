@@ -142,11 +142,16 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 			throw e;
 		}
 		PlaceOrderResponse placeOrderResponse = gson.fromJson(data, PlaceOrderResponse.class);
-		logger.info("AppOrderId: " + placeOrderResponse.getResult().getAppOrderID().toString() +
-				", Description: " + placeOrderResponse.getDescription() +
-				", Code: " + placeOrderResponse.getCode() +
-				", Type: " + placeOrderResponse.getType());
-		return placeOrderResponse;
+		if(placeOrderResponse!=null && placeOrderResponse.getResult()!=null) {
+			logger.info("AppOrderId: " + placeOrderResponse.getResult().getAppOrderID().toString() +
+					", Description: " + placeOrderResponse.getDescription() +
+					", Code: " + placeOrderResponse.getCode() +
+					", Type: " + placeOrderResponse.getType());
+			return placeOrderResponse;
+		}else{
+			logger.error("Place order response is null");
+			return null;
+		}
 	}
 	/**
 	 * it return all transaction detail report of requested orderID
