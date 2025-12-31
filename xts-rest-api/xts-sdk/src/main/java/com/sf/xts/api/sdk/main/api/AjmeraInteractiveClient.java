@@ -80,7 +80,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		interactiveURL = (String)((JSONObject)jsonObject.get("result")).get("connectionString");
 	}
 
-	public String Login(String secretKey, String appKey,String commonUrl,String port,String version) throws APIException, IOException {
+	public String Login(String secretKey, String appKey,String commonUrl,String port,String version, String accessToken) throws APIException, IOException {
 		this.HostLookUp(commonUrl,port,version);
 		HttpPost request = new HttpPost(interactiveURL + loginINT);
 		request.addHeader("content-type", "application/json");
@@ -89,6 +89,11 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		data.put("appKey", appKey);
 		data.put("uniqueKey", uniqueKey);
 		data.put("source", source);
+		if (accessToken != null){
+			data.put("accessToken", accessToken);
+		} else {
+			data.put("source", source);
+		}
 		String response = this.requestHandler.processPostHttpRequest(request, data, "LOGIN", authToken);
 		if (response != null) {
 			JSONObject jsonObject = new JSONObject(response);
