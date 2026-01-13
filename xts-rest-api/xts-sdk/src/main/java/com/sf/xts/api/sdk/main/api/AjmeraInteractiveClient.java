@@ -68,7 +68,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		sh.addListner(obj);
 	}
 
-	public void HostLookUp(String commonUrl,String port,String version) throws APIException {
+	public String HostLookUp(String commonUrl,String port,String version) throws APIException {
 		HttpPost request = new HttpPost(port != null ? commonUrl + port + this.hostLookUp : commonUrl + this.hostLookUp);
 		request.addHeader("content-type", "application/json");
 		JSONObject data = new JSONObject();
@@ -78,22 +78,22 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		JSONObject jsonObject = new JSONObject(response);
 		uniqueKey = (String)((JSONObject)jsonObject.get("result")).get("uniqueKey");
 		interactiveURL = (String)((JSONObject)jsonObject.get("result")).get("connectionString");
+		return interactiveURL;
 	}
 
 	public String Login(String secretKey, String appKey,String commonUrl,String port,String version, String accessToken) throws APIException, IOException {
-		this.HostLookUp(commonUrl,port,version);
-		HttpPost request = new HttpPost(interactiveURL + loginINT);
-		request.addHeader("content-type", "application/json");
 		JSONObject data = new JSONObject();
 		data.put("secretKey", secretKey);
 		data.put("appKey", appKey);
-		data.put("uniqueKey", uniqueKey);
-		data.put("source", source);
 		if (accessToken != null){
 			data.put("accessToken", accessToken);
 		} else {
 			data.put("source", source);
+			this.HostLookUp(commonUrl,port,version);
 		}
+		data.put("uniqueKey", uniqueKey);
+		HttpPost request = new HttpPost(interactiveURL + loginINT);
+		request.addHeader("content-type", "application/json");
 		String response = this.requestHandler.processPostHttpRequest(request, data, "LOGIN", authToken);
 		if (response != null) {
 			JSONObject jsonObject = new JSONObject(response);
