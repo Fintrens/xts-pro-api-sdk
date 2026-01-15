@@ -33,30 +33,24 @@ public class AjmeraRequestHandler {
 
 	public static Logger logger = LoggerFactory.getLogger(AjmeraRequestHandler.class);
 	RequestConfig requestConfig = RequestConfig.custom()
-			.setConnectionRequestTimeout(300000)
+			.setConnectionRequestTimeout(10000)
 			.setConnectTimeout(10000)
-			.setSocketTimeout(10000)
+			.setSocketTimeout(3000)
 			.build();
-	private final PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
 	private HttpClient httpClient;
 	ObjectMapper objectMapper = new ObjectMapper();
 
 	public AjmeraRequestHandler() {
-		manager.setMaxTotal(50);
-		manager.setDefaultMaxPerRoute(50);
 		httpClient = HttpClientBuilder.create()
 				.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
-				.setConnectionManager(manager)
 				.setDefaultRequestConfig(this.requestConfig)
-				.setMaxConnPerRoute(50).build();
+				.setMaxConnPerRoute(50)
+				.build();
 	}
 
 	public AjmeraRequestHandler(String proxyHost, int proxyPort, String proxyUsername, String proxyPassword) {
-		manager.setMaxTotal(50);
-		manager.setDefaultMaxPerRoute(50);
 		HttpClientBuilder clientBuilder = HttpClientBuilder.create()
 				.setSSLSocketFactory(ConfigurationProvider.sslSocketFactory)
-				.setConnectionManager(manager)
 				.setDefaultRequestConfig(this.requestConfig)
 				.setMaxConnPerRoute(50);
 		HttpHost proxy = new HttpHost(proxyHost, proxyPort);
@@ -185,6 +179,4 @@ public class AjmeraRequestHandler {
 		return content;
 
 	}
-
-	public PoolingHttpClientConnectionManager cm() { return manager; }
 }
