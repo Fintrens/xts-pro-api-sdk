@@ -15,6 +15,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.pool.PoolStats;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import java.io.IOException;
  * @author SymphonyFintech
  */
 public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
+	private final PoolingHttpClientConnectionManager cm;
 	private HttpClient httpClient = HttpClientBuilder.create().build();
 	Gson gson = new Gson();
 	private  SocketHandler sh=null;
@@ -51,6 +54,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		loadConfiguration();
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
 		requestHandler = new AjmeraRequestHandler();
+		cm = requestHandler.cm();
 	}
 
 	public AjmeraInteractiveClient(String brokerName,XTSAPIInteractiveEvents xtsapiInteractiveEvents,String proxyHost,int proxyPort,String proxyType,String proxyUsername,String proxyPassword) throws IOException {
@@ -62,6 +66,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		loadConfiguration();
 		this.xtsapiInteractiveEvents = xtsapiInteractiveEvents;
 		requestHandler = new AjmeraRequestHandler(proxyHost, proxyPort, proxyUsername, proxyPassword);
+		cm = requestHandler.cm();
 	}
 
 	public void addListner(XTSAPIInteractiveEvents obj ) {
@@ -108,6 +113,7 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 	}
 
 	public Position getPosition(String posType) throws APIException, IOException {
+		logPool("BEFORE");
 		try {
 			String data = requestHandler.processGettHttpRequest(
 					new HttpGet(interactiveURL + positions
@@ -116,10 +122,12 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 					"POSITION",
 					authToken
 			);
+			logPool("AFTER_ACQUIRE");
 			Position position = gson.fromJson(data, Position.class);
 			return position;
 		} catch (APIException e) {
 			logger.error("APIException occurred while fetching position: {}", e.getMessage());
+			logPool("ON_EXCEPTION");
 			throw e;
 		}
 	}
@@ -141,9 +149,12 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		placeOrderJson.put("apiOrderSource","FIREFLY_BY_FINTRENS");
 		String data;
 		try {
+			logPool("BEFORE");
 		 data = requestHandler.processPostHttpRequest(new HttpPost(interactiveURL + orderBook),placeOrderJson,"PLACEORDER",authToken);
+			logPool("AFTER_ACQUIRE");
 		} catch (APIException e) {
 			logger.error("APIException occurred while placing order: {}", e.getMessage());
+			logPool("ON_EXCEPTION");
 			throw e;
 		}
 		PlaceOrderResponse placeOrderResponse = gson.fromJson(data, PlaceOrderResponse.class);
@@ -167,11 +178,14 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 	public OrderHistoryResponse getOrderHistory(String appOrderID) throws APIException, IOException {
 		String data;
 		try {
+			logPool("BEFORE");
 			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook
 					+ "?appOrderID=" + appOrderID
 					+ "&clientID=" + clientID), "ORDERHISTORY", authToken);
+			logPool("AFTER_ACQUIRE");
 		} catch (APIException e) {
 			logger.error("APIException occurred while fetching order history for appOrderID {}: {}", appOrderID, e.getMessage());
+			logPool("ON_EXCEPTION");
 			throw e;
 		}
 		OrderHistoryResponse orderHistoryResponse = gson.fromJson(data, OrderHistoryResponse.class);
@@ -186,9 +200,12 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 	public OrderBook getOrderBook() throws APIException, IOException {
 		String data;
 		try {
+			logPool("BEFORE");
 			data = requestHandler.processGettHttpRequest(new HttpGet(interactiveURL + orderBook + "?clientID=" + clientID), "ORDERBOOK", authToken);
+			logPool("AFTER_ACQUIRE");
 		} catch (APIException e) {
 			logger.error("APIException occurred while fetching order book: {}", e.getMessage());
+			logPool("ON_EXCEPTION");
 			throw e;
 		}
 		OrderBook orderBookResponse = gson.fromJson(data, OrderBook.class);
@@ -197,13 +214,16 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 	public CancelOrderResponse CancelOrder(String appOrderId,String orderUniqueIdentifier) throws APIException {
 		String data;
 		try {
+			logPool("BEFORE");
 			data = requestHandler.processDeleteHttpRequest(new HttpDelete(interactiveURL + "/orders"
 							+ "?appOrderID=" + appOrderId
 							+ "&orderUniqueIdentifier=" + orderUniqueIdentifier
 							+ "&clientID=" + clientID)
 					, "CANCELORDER", authToken);
+			logPool("AFTER_ACQUIRE");
 		} catch (APIException e) {
 			logger.error("APIException occurred while cancelling order with appOrderID {}: {}", appOrderId, e.getMessage());
+			logPool("ON_EXCEPTION");
 			throw e;
 		}
 		CancelOrderResponse cancelOrderResponse = gson.fromJson(data, CancelOrderResponse.class);
@@ -214,5 +234,10 @@ public  class AjmeraInteractiveClient extends AjmeraConfigurationProvider {
 		sh = new SocketHandler(commonURL, user, authToken);
 		sh.addListner(xtsapiInteractiveEvents);
 		return true;
+	}
+
+	private void logPool(String phase) {
+		PoolStats stats = cm.getTotalStats();
+		logger.info("[HTTP POOL {}] leased= {} avail= {} pending= {} max= {}", phase, stats.getLeased(), stats.getAvailable(), stats.getPending(), stats.getMax());
 	}
 }
