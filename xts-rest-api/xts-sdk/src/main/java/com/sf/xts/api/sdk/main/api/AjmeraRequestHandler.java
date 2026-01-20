@@ -9,6 +9,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -16,6 +17,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
@@ -38,7 +40,7 @@ public class AjmeraRequestHandler {
 			.setSocketTimeout(10000)
 			.build();
 	private final PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
-	private HttpClient httpClient;
+	private CloseableHttpClient httpClient;
 	ObjectMapper objectMapper = new ObjectMapper();
 
 	public AjmeraRequestHandler() {
@@ -73,7 +75,7 @@ public class AjmeraRequestHandler {
 
 	String processPostHttpHostRequest(HttpPost request, JSONObject data, String requestname) {
 		logger.info("-----POST " + requestname + " REQUEST-----" + request);
-		HttpResponse response = null;
+		CloseableHttpResponse response = null;
 		String content = null;
 		try {
 			request.setEntity(new StringEntity(data.toString(), ContentType.APPLICATION_JSON));
@@ -87,13 +89,19 @@ public class AjmeraRequestHandler {
 		} catch (APIException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException ignored) {}
+			}
 		}
 		return content;
 	}
 
 	String processPostHttpRequest(HttpPost request,JSONObject data, String  requestname,String authToken) throws IOException, APIException {
 		logger.info("-----POST "+requestname+" REQUEST-----"+request);
-		HttpResponse response = null;
+		CloseableHttpResponse response = null;
 		String content = null;
 		try {
 			request.addHeader("content-type", "application/json");
@@ -119,6 +127,12 @@ public class AjmeraRequestHandler {
 			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
 				throw e;
 			}
+		} finally {
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException ignored) {}
+			}
 		}
 		return content;
 
@@ -132,7 +146,7 @@ public class AjmeraRequestHandler {
 			request.addHeader("authorization", MarketdataClient.authToken);
 		else
 			request.addHeader("authorization", authToken);
-		HttpResponse response = null;
+		CloseableHttpResponse response = null;
 		String content = null;
 		try {
 			response = httpClient.execute(request);
@@ -153,6 +167,12 @@ public class AjmeraRequestHandler {
 			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
 				throw e;
 			}
+		} finally {
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException ignored) {}
+			}
 		}
 		return content;
 
@@ -164,7 +184,7 @@ public class AjmeraRequestHandler {
 			request.addHeader("authorization", MarketdataClient.authToken);
 		else
 			request.addHeader("authorization", authToken);
-		HttpResponse response = null;
+		CloseableHttpResponse response = null;
 		Map<String, Object> map = null;
 		String content = null;
 		try {
@@ -182,10 +202,14 @@ public class AjmeraRequestHandler {
 			if (errorMessage != null && errorMessage.contains("\"code\":\"e-session-0005\"")) {
 				throw e;
 			}
+		} finally {
+			if (response != null) {
+				try {
+					response.close();
+				} catch (IOException ignored) {}
+			}
 		}
 		return content;
 
 	}
-
-	public PoolingHttpClientConnectionManager cm() { return manager; }
 }
